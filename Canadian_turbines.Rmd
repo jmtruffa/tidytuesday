@@ -1,0 +1,57 @@
+---
+title: "Canadian Turbines"
+output: html_notebook
+---
+## Canadian Turbines
+
+```{r}
+# loading the data
+
+wind_turbine <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-10-27/wind-turbine.csv')
+
+```
+### First, we'll find out how many GW of clean energy, coming from eolic turbines, does Canada owns on every Province·
+
+```{r}
+
+wind_turbine %>% 
+  mutate(turbine_rated_capacity_m_w = turbine_rated_capacity_k_w / 1000) %>% 
+  count(province_territory, wt = turbine_rated_capacity_m_w, sort = TRUE) %>% 
+  mutate(province_territory = fct_reorder(province_territory, n)) %>% 
+  ggplot(aes(province_territory, n, fill = province_territory))+
+  geom_col() +
+  coord_flip() +
+  labs(title = "Canadian GW availability per Province", 
+       x = "Province",
+       y = "Total MW Capacity") +
+  theme(legend.position = "none")
+  
+```
+Is the turbine generated electricity directed to residential usage?
+Is Ontario or Quebec the more populated provinces in Canada?
+Does this data goes in accordance to that?
+
+
+### Secondly: How was the unfolding of the Canadian capacity commissioning 
+
+```{r}
+wind_turbine %>% 
+  count(commissioning_date, wt=turbine_rated_capacity_k_w / 1000) %>% 
+  ggplot(aes(commissioning_date, n, fill = commissioning_date)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  theme(legend.position = "none") +
+  labs(title = "Turbine commissioning unfolding", 
+       x = "Year",
+       y = "Total MW Capacity") +
+  theme(legend.position = "none")
+```
+
+Have they've reached needed capacity circa 2014/2015?
+After that period it appears to be a decline in commissioning. 
+ToDo: cross this data with population, density, electrical capacity in order to test for the previous question.
+
+
+
+
+
